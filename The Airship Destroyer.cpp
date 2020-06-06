@@ -1,4 +1,4 @@
-﻿#include<stdio.h>
+#include<stdio.h>
 #include<stdlib.h>
 #include<Windows.h>
 #include<conio.h>
@@ -6,9 +6,17 @@
 
 //全局变量
 int position_x, position_y;//飞机位置
+int position_vx, position_vy;//飞机速度
 int width, high;//主游戏界面宽、高，必要地方i,j于之对应
-
-
+char isBegin, isEnd;//开始与结束界面的结束判定标志
+int cmd_x, cmd_y;//开始与结束界面的文字位置
+int flag1;//软件是否退出标志 0继续 1结束
+int flag2;//游戏是否结束标志 0继续 1结束
+int enemy_x, enemy_y;//敌机坐标
+int enemy_vx, enemy_vy;//敌机速度
+int bullet_x, bullet_y;//子弹位置
+int bullet_vx, bullet_vy;//子弹速度
+char input;//游戏输入
 //函数声明
 
 
@@ -24,32 +32,51 @@ void gotoxy(int x,int y);//较好清屏重画函数
 //主函数开始
 
 int main(void) {
-	begin();
 	startup();// 数据初始化
-	while (1) {
-		show();
-		updateWithInput();
-		updateWithoutInput();
+	while (flag1==0) {
+		begin();
+		while (flag2 == 0) {
+			show();
+			updateWithInput();
+			updateWithoutInput();
+		}
+		end();
 	}
-	end();
 	return 0;
 }
 
 void startup() {
-	width = 20;
+	width = 30;
 	high = 30;
 	position_x = width / 2;
 	position_y = high - 2;
+	position_vx = 1;
+	position_vy = 1;
+	cmd_x = 5;
+	cmd_y = 9;
+	flag1 = 0;
+	flag1 = 0;
+	enemy_x = rand() % width;
+	enemy_y = 0;
+	enemy_vx = 0;
+	enemy_vy = 1;
+	bullet_vx = 0;
+	bullet_vy = -1;
 }
 void show() {
 	//system("cls"); //清屏函数闪屏太严重
 	gotoxy(0,0);  //将光标移到（0，0），相当于清屏重画
+	HideCursor();//隐藏光标
 	for (int j = 0; j <= high; j++) {
 		for (int i = 0; i <= width; i++) {
-			if (i == position_x && j == position_y)
+			if (i == position_x && j == position_y && i > 0 && i < width && j>0 && j < high)
 				printf("*");//打印飞机
 			else if (i == 0 || i == width || j == 0 || j == high)
 				printf("*");//打印边框
+			else if (i == enemy_x && j == enemy_y)
+				printf("@");
+			else if (i == bullet_x && j == bullet_y)
+				printf("|");
 			else
 				printf(" ");//打印其余空白处
 		}
@@ -57,19 +84,91 @@ void show() {
 	}
 }
 void updateWithInput() {
-
+	if (_kbhit()) {
+		
+			input = _getch();
+			switch (input) {
+			case 'w': {
+				if(position_y!=1)
+				position_y = position_y - position_vy; 
+			}
+				break;
+			case's': {
+				if (position_y != high-1)
+					position_y = position_y + position_vy; 
+			}
+				break;
+			case'a': {
+				if (position_x != 1)
+					position_x = position_x - position_vx; 
+			}
+				break;
+			case'd': {
+				if (position_x != width-1)
+					position_x = position_x + position_vx;
+			}
+				break;
+			case' ': {
+				bullet_x = position_x;
+				bullet_y = position_y - 1;
+			}
+				   break;
+			}
+		}
 }
 
 void updateWithoutInput() {
-
+	//子弹移动
+	bullet_x = bullet_x + bullet_vx;
+	bullet_y = bullet_y + bullet_vy;
+	//敌机移动
+	enemy_x = enemy_x + enemy_vx;
+	enemy_y = enemy_y + enemy_vy;
 }
 
 void begin() {
+	system("mode con cols=34 lines=32");//控制台大小 宽34 高32
+	HideCursor();
+	for(int i=0;i<=width;i++)
+		printf("-");
+	gotoxy(cmd_x, cmd_y);
+	printf("The Airship Destroyer");
+	gotoxy(cmd_x+5, cmd_y+2);
+	printf("Version  1.0");
+	gotoxy(cmd_x+1, cmd_y+5);
+	printf("(Enter n to start)");
+	gotoxy(0, high);
+	for (int i = 0; i <= width; i++)
+		printf("-");
+	isBegin = _getch();
+	while (isBegin != 'n') {
+		isBegin = _getch();
+	}
+	
 
 }
 
 void end() {
-
+	//游戏退出界面显示   未改完
+	for (int i = 0; i <= width; i++)
+		printf("-");
+	gotoxy(cmd_x, cmd_y);
+	printf("The Airship Destroyer");
+	gotoxy(cmd_x + 5, cmd_y + 2);
+	printf("Version  1.0");
+	gotoxy(cmd_x + 1, cmd_y + 5);
+	printf("(Enter n to restart or q to exit)");
+	gotoxy(0, high);
+	for (int i = 0; i <= width; i++)
+		printf("-");
+	isBegin = _getch();
+	while ((isEnd != 'n')&&(isEnd != 'q')) {
+		isEnd = _getch();
+	}
+	if (isEnd == 'n')//实现游戏重新开始与结束退出
+		flag1 = 0;
+	else if (isEnd == 'q') 
+		flag1 = 1;	
 }
 
 void gotoxy(int x, int y) {
