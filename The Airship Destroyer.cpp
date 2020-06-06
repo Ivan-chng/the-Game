@@ -17,11 +17,13 @@ int enemy_vx, enemy_vy;//敌机速度
 int bullet_x, bullet_y;//子弹位置
 int bullet_vx, bullet_vy;//子弹速度
 char input;//游戏输入
+
 int blood;//血量 
 int blood_x,blood_y;//血量显示位置 
 int score;//得分
 int score_x,score_y;//分数显示位置 
  
+
 //函数声明
 
 
@@ -57,7 +59,9 @@ void startup() {
 	position_y = high - 2;
 	position_vx = 1;
 	position_vy = 1;
+
 	cmd_x = 11;
+
 	cmd_y = 9;
 	flag1 = 0;
 	flag1 = 0;
@@ -67,19 +71,23 @@ void startup() {
 	enemy_vy = 1;
 	bullet_vx = 0;
 	bullet_vy = -1;
+
 	blood = 3;
 	blood_x = width+2;
 	blood_y = high-2;
 	score = 0;
 	score_x = width+2;
 	score_y = high-4; 
+
 }
 void show() {
 	//system("cls"); //清屏函数闪屏太严重
 	gotoxy(0,0);  //将光标移到（0，0），相当于清屏重画
 	HideCursor();//隐藏光标
 	for (int j = 0; j <= high; j++) {
+
 		for (int i = 0; i <= width+12; i++) {
+
 			if (i == position_x && j == position_y && i > 0 && i < width && j>0 && j < high)
 				printf("*");//打印飞机
 			else if (i == 0 || i == width || j == 0 || j == high)
@@ -88,11 +96,13 @@ void show() {
 				printf("@");
 			else if (i == bullet_x && j == bullet_y)
 				printf("|");
+
 			else if (i == blood_x && j ==blood_y )
 				printf("BLOOD:%d",blood);
 			else if (i == score_x && j == score_y) 
 				printf("SCORE:%d",score);
 			
+
 			else
 				printf(" ");//打印其余空白处
 		}
@@ -140,6 +150,7 @@ void updateWithoutInput() {
 	//敌机移动
 	enemy_x = enemy_x + enemy_vx;
 	enemy_y = enemy_y + enemy_vy;
+
 	//击中得分 
 	if(enemy_x == bullet_x&&(enemy_y == bullet_y||enemy_y == bullet_y-1))
 	{
@@ -182,6 +193,7 @@ void begin() {
 	gotoxy(cmd_x+1, cmd_y+5);
 	printf("(Enter n to start)");
 	gotoxy(0, high);
+
 	for (int i = 0; i <= width+13; i++)
 		printf("-");
 	isBegin = _getch();
@@ -194,6 +206,7 @@ void begin() {
 
 void end() {
 	//游戏退出界面显示   未改完
+
 	system("cls");
 	for (int i = 0; i <= width+13; i++)
 		printf("-");
@@ -211,6 +224,7 @@ void end() {
 		isEnd = _getch();
 	}
 	if (isEnd == 'n')//实现游戏重新开始与结束退出
+
 		{
 		flag1 = 0;
 		flag2 = 0;
